@@ -75,8 +75,9 @@ class EmployeeTaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(EmployeeTask $employeeTask)
+    public function destroy($id)
     {
+        $employeeTask = EmployeeTask::findOrFail($id);
         $employeeTask->delete();
         return response()->noContent();
     }
