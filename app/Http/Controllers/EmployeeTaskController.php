@@ -49,8 +49,10 @@ class EmployeeTaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, EmployeeTask $employeeTask)
+    public function update(Request $request, $id)
     {
+        $employeeTask = EmployeeTask::findOrFail($id);
+        
         $data = $request->validate([
             'employee_name' => 'sometimes|string',
             'task_description' => 'sometimes|string',
@@ -62,9 +64,9 @@ class EmployeeTaskController extends Controller
 
         if (isset($data['hours_spent']) || isset($data['hourly_rate']) || isset($data['additional_charges'])) {
             $data['total_remuneration'] = $this->calculateRemuneration(
-                $data['hours_spent'],
-                $data['hourly_rate'],
-                $data['additional_charges'] ?? 0
+                $data['hours_spent'] ?? $employeeTask->hours_spent,
+                $data['hourly_rate'] ?? $employeeTask->hourly_rate,
+                $data['additional_charges'] ?? $employeeTask->additional_charges ?? 0
             );
         }
 
