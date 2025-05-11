@@ -29,7 +29,11 @@ class EmployeeTaskController extends Controller
             'additional_charges' => 'nullable|numeric',
         ]);
 
-        $data['total_remuneration'] = ($data['hours_spent'] * $data['hourly_rate']) + ($data['additional_charges'] ?? 0);
+        $data['total_remuneration'] = $this->calculateRemuneration(
+            $data['hours_spent'],
+            $data['hourly_rate'],
+            $data['additional_charges'] ?? 0
+        );
 
         return EmployeeTask::create($data);
     }
@@ -57,9 +61,11 @@ class EmployeeTaskController extends Controller
         ]);
 
         if (isset($data['hours_spent']) || isset($data['hourly_rate']) || isset($data['additional_charges'])) {
-            $data['total_remuneration'] = ($data['hours_spent'] ?? $employeeTask->hours_spent) *
-                ($data['hourly_rate'] ?? $employeeTask->hourly_rate) +
-                ($data['additional_charges'] ?? $employeeTask->additional_charges);
+            $data['total_remuneration'] = $this->calculateRemuneration(
+                $data['hours_spent'],
+                $data['hourly_rate'],
+                $data['additional_charges'] ?? 0
+            );
         }
 
         $employeeTask->update($data);
@@ -73,5 +79,11 @@ class EmployeeTaskController extends Controller
     {
         $employeeTask->delete();
         return response()->noContent();
+    }
+
+
+    private function calculateRemuneration($hoursSpent, $hourlyRate, $additionalCharges)
+    {
+        return ($hoursSpent * $hourlyRate) + $additionalCharges;
     }
 }
